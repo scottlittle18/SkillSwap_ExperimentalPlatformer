@@ -18,10 +18,4 @@ public class DoubleJumpSkill : MonoBehaviour
         if (transform.parent != null && transform.parent.tag != "SkillContainer")
             playerController = GetComponentInParent<PlayerController>();
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

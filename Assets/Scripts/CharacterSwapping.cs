@@ -21,13 +21,13 @@ public class CharacterSwapping : MonoBehaviour
     void Update()
     {
         //Character Swapping
-        if (Input.GetKeyDown("1"))
+        if (Input.GetButtonDown("SwitchToPlayer_1"))
         {
             yellowCharacter.CanMove = false;
             greenCharacter.CanMove = true;
             transform.position = greenCharacter.transform.position;
         }
-        else if (Input.GetKeyDown("2"))
+        else if (Input.GetButtonDown("SwitchToPlayer_2"))
         {
             greenCharacter.CanMove = false;
             yellowCharacter.CanMove = true;

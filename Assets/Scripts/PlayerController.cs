@@ -12,9 +12,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float jumpHeight;
     [SerializeField]
-    [Tooltip("This determines the maximum number of skills a character can have at any given time")]
-    private int maxNumberOfSkills;
-    [SerializeField]
     private float groundCheckRadius;
     [SerializeField]
     [Tooltip("The transform of the groundCheck GameObject")]
@@ -23,7 +20,6 @@ public class PlayerController : MonoBehaviour
     #region Non-Serialized Fields
     private Rigidbody2D playerRigidBody;
     private CircleCollider2D isTriggerCollision;
-    private int currentNumberOfSkills;
     private float moveInput;
     private bool jumpInput, canJump, onGround;
     private float playerMovement;
@@ -31,27 +27,32 @@ public class PlayerController : MonoBehaviour
     private LayerMask whatIsGround;
     #endregion
     #region Active Skill Related Fields
-    private bool doubleJumpEnabled;
+    //Double Jump Skill
+    private bool skill_doubleJumpEnabled;
     private DoubleJumpSkill doubleJumpSkill;
+    //Floating Platform Skill
+    private bool skill_floatingPlatformEnabled;
+    private bool isSuspended, suspensionInput;
+    private FloatingPlatformSkill floatingPlatformSkill;
     #endregion
 
     #region Properties
     public bool CanMove
     {
-        get
-        {
-            return canMove;
-        }
-        set
-        {
-            canMove = value;
-        }
+        get{ return canMove; }
+        set=> canMove = value;
     }
 
-    public bool DoubleJumpEnabled
+    public bool Skill_DoubleJumpEnabled
     {
-        get { return doubleJumpEnabled; }
-        set => doubleJumpEnabled = value;
+        get { return skill_doubleJumpEnabled; }
+        set => skill_doubleJumpEnabled = value;
+    }
+
+    public bool Skill_FloatingPlatformEnabled
+    {
+        get { return skill_floatingPlatformEnabled; }
+        set => skill_floatingPlatformEnabled = value;
     }
     #endregion
 
@@ -63,63 +64,30 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        CheckIfOnGround();
-        /*
-        if(onGround)
-        {
-            canJump = true;
+        CheckIfOnGround();        
 
-            if(DoubleJumpEnabled)
-            {
-                doubleJumpSkill.HasDoubleJumped = false;
-            }
-            
-        }
-        else if(!onGround)
+        if(CanMove && !isSuspended)
         {
-            canJump = false;
-
-            if (DoubleJumpEnabled)
-            {
-                doubleJumpSkill.HasDoubleJumped = true;
-            }
-        }
-        */
-        if(CanMove)
-        {
-            //Unlock all movement restraints EXCEPT Z-Rotation
-            playerRigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
             MovementHandler();
+
             if (onGround)
             {
                 canJump = true;
-
-                if (DoubleJumpEnabled)
-                {
-                    //doubleJumpSkill.HasDoubleJumped = false;
-                }
-
             }
             else if (!onGround)
             {
                 canJump = false;
-
-                if (DoubleJumpEnabled)
-                {
-                    //doubleJumpSkill.HasDoubleJumped = true;
-                }
             }
         }
         else if (!CanMove)
         {
             if(!onGround)
             {
-                //Allows the newly inactive Character to fall to the ground before 
-                //  stopping all movement if Characters are swapped in midair
+                //Allows the newly inactive Character to fall to the ground before stopping all movement if Characters are swapped in midair
                 playerRigidBody.constraints = RigidbodyConstraints2D.FreezePositionX;
                 playerRigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
             }
-            else if(onGround)
+            else if(onGround || isSuspended)
             {
                 //Stop all movement if the Character is no longer the Active Player and is on the Ground
                 playerRigidBody.constraints = RigidbodyConstraints2D.FreezeAll;
@@ -130,86 +98,82 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        //TODO: Debug Log
-        Debug.Log(gameObject.name + "'s grounded variable = " + onGround);
-        //TODO: DebugLog
-        Debug.Log("DoubleJumpEnabled = " + DoubleJumpEnabled);
-        //CheckCurrentSkills();
-        
-        if (CanMove)
+        if (CanMove && !isSuspended)
         {
-            //Unlock all movement restraints EXCEPT Z-Rotation
-            playerRigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
+            //TODO: onGround Check
+            Debug.Log(gameObject.name + "'s grounded variable = " + onGround);
+
             GetMovementInput();
 
             if (onGround)
             {
                 canJump = true;
 
-                if (DoubleJumpEnabled)
+                if (Skill_DoubleJumpEnabled)
                 {
                     doubleJumpSkill.HasDoubleJumped = false;
+                }
+                else if(Skill_FloatingPlatformEnabled)
+                {
+                    floatingPlatformSkill.FirstJump = true;
                 }
             }
             else if (!onGround)
             {
                 canJump = false;
-
-                if (DoubleJumpEnabled)
-                {
-                    //doubleJumpSkill.HasDoubleJumped = ;
-                }
             }
         }
-        else if (!CanMove)
+        else if (!CanMove || isSuspended)
         {
-            if (!onGround)
+            if (!onGround && !isSuspended)
             {
                 //Allows the newly inactive Character to fall to the ground before 
                 //  stopping all movement if Characters are swapped in midair
                 playerRigidBody.constraints = RigidbodyConstraints2D.FreezePositionX;
                 playerRigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
             }
-            else if (onGround)
+            else if (onGround || isSuspended)
             {
                 //Stop all movement if the Character is no longer the Active Player and is on the Ground
                 playerRigidBody.constraints = RigidbodyConstraints2D.FreezeAll;
             }
-        }
-        
+        }        
     }
 
     private void InitializePlayer()
     {
-        DoubleJumpEnabled = false;
+        Skill_DoubleJumpEnabled = false;
+        Skill_FloatingPlatformEnabled = false;
+
         whatIsGround = LayerMask.GetMask("Ground");
         groundCheck = gameObject.transform.GetChild(0); //Retrieves the transform component from the child named GroundCheck
         playerRigidBody = GetComponent<Rigidbody2D>();
         isTriggerCollision = GetComponent<CircleCollider2D>();
 
         doubleJumpSkill = GameObject.Find("Skill_DoubleJump").GetComponent<DoubleJumpSkill>();
+        floatingPlatformSkill = GameObject.Find("Skill_FloatingPlatform").GetComponent<FloatingPlatformSkill>();
     }
 
     private void CheckIfOnGround()
     {
-        onGround = Physics2D.OverlapCircle(groundCheck.position,
-            groundCheckRadius, whatIsGround);
+        onGround = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, whatIsGround);
     }
 
+    #region Public Skill Switch Handlers
     public void CheckCurrentSkills(Component skillToActivate)
     {
         //TODO: Debug SkillName Check
         Debug.Log(skillToActivate.name + " was the component recieved by the player character");
-        if (skillToActivate.name == "SkillConnectionTest")
+        if (skillToActivate.name == "Skill_FloatingPlatform")
         {
-            //skillToActivate = GetComponent<SkillConnectionTest>();
+            Skill_FloatingPlatformEnabled = true;
+
             //TODO: Debug Log
             Debug.Log("Connection was successful. The PLAYERCONTROLLER now has an attached skill called " + skillToActivate);
         }
         else if (skillToActivate.name == "Skill_DoubleJump")
         {
-            doubleJumpSkill = skillToActivate.GetComponent<DoubleJumpSkill>();
-            DoubleJumpEnabled = true;
+            Skill_DoubleJumpEnabled = true;
 
             //TODO: Debug Log
             Debug.Log("Connection was successful. The PLAYERCONTROLLER now has an attached skill called " + skillToActivate);
@@ -219,44 +183,78 @@ public class PlayerController : MonoBehaviour
 
     public void DisableAndRemoveSkill(GameObject skillToDeactivate)
     {
-        if (skillToDeactivate.name == "SkillConnectionTest")
+        if (skillToDeactivate.name == "Skill_FloatingPlatform")
         {
-            //skillToDeactivate = GetComponent<SkillConnectionTest>();
+            Skill_FloatingPlatformEnabled = false;
             //TODO: Debug Log
-            Debug.Log("Connection was successful. The PLAYERCONTROLLER has now Deactivated the skill called " + skillToDeactivate);
+            Debug.Log("Removal was successful. The PLAYERCONTROLLER has now Deactivated the skill called " + skillToDeactivate);
         }
-        else if (skillToDeactivate.name == "DoubleJumpSkill")
+        else if (skillToDeactivate.name == "Skill_DoubleJump")
         {
-            doubleJumpSkill = skillToDeactivate.GetComponent<DoubleJumpSkill>();
-            DoubleJumpEnabled = false;
+            Skill_DoubleJumpEnabled = false;
             //TODO: Debug Log
-            Debug.Log("Connection was successful. The PLAYERCONTROLLER has now Deactivated the skill called " + skillToDeactivate);
+            Debug.Log("Deactivation of " + skillToDeactivate + " was successful.");
         }
     }
+    #endregion
 
     private void GetMovementInput()
     {
         //Initialize Movement Variables
         moveInput = Input.GetAxisRaw("Horizontal");
         jumpInput = Input.GetButtonDown("Jump");
+        suspensionInput = Input.GetButtonUp("Jump");
         //TODO: Debug
-        Debug.Log("jumpInput = " + jumpInput);
-        //Regular Jump
-        if (jumpInput && onGround && canJump)
+        Debug.Log("jumpInput = " + jumpInput); //<-- TODO: Keep this to use for testing the Midair Ability
+
+        
+
+        //Only Accept this input if the FloatingPlatformSkill is Enabled
+        if (Skill_FloatingPlatformEnabled && onGround && jumpInput)
+        {
+            //TODO: Debug
+            Debug.Log("suspensionInput = " + suspensionInput + "If Statement Nest Level 1");
+            //TODO: Debug
+            Debug.Log("floatingPlatformSkill - FirstJump = " + floatingPlatformSkill.FirstJump);
+
+            JumpHandler();
+
+            if (floatingPlatformSkill.FirstJump && suspensionInput)
+            {
+                //TODO: Debug
+                Debug.Log("If Statement Nest Level 2");
+                isSuspended = true;
+                floatingPlatformSkill.FirstJump = false;             
+            }
+            if(!floatingPlatformSkill.FirstJump && jumpInput && isSuspended)
+            {
+                //TODO: Debug
+                Debug.Log("If Statement Nest Level 3");
+                //TODO: Debug
+                Debug.Log("If Statement Nest Level 4 - Final");
+                //isSuspended = false;
+
+                //playerRigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
+
+                JumpHandler();                
+            }
+        }
+
+        //Regular Jump - Let the other If-Else handle the position freezing and
+        else if (jumpInput && onGround && canJump && !Skill_FloatingPlatformEnabled)
         {
             //TODO: Debug
             Debug.Log("Regular Jump check_ jumpInput = " + jumpInput);
             JumpHandler();
-        }
+        }        
+
         //For Double Jump Skill
-        if (jumpInput && DoubleJumpEnabled && !onGround && !doubleJumpSkill.HasDoubleJumped)
+        if (jumpInput && Skill_DoubleJumpEnabled && !onGround && !doubleJumpSkill.HasDoubleJumped && !Skill_FloatingPlatformEnabled)
         {
-            //TODO: Debug.Log - DoubleJump - DepthTest_L1
-            Debug.Log("DoubleJump - DepthTest_L1 - SUCCESS");
             DoubleJumpHandler();
         }
     }
-
+    
     private void JumpHandler()
     {        
         playerRigidBody.AddForce(Vector2.up * jumpHeight, ForceMode2D.Impulse);
@@ -264,8 +262,6 @@ public class PlayerController : MonoBehaviour
 
     private void DoubleJumpHandler()
     {
-        //TODO: Debug.Log - DoubleJump - DepthTest_L3 - Inside Method
-        Debug.Log("DoubleJump - DepthTest_L3 - Inside Method - SUCCESS");
         AddDoubleJumpForce();
         doubleJumpSkill.HasDoubleJumped = true;
     }
@@ -289,7 +285,7 @@ public class PlayerController : MonoBehaviour
         }
         else if (playerRigidBody.velocity.x < -0.1)
         {
-            //TODO: Temporarily Disabling Sprite Flipping
+            //TODO: IF art that needs to be flipped is added, remember to flip the children of this object as well***
             /*
             transform.localScale = new Vector3(-this.transform.localScale.x, this.transform.localScale.y, this.transform.localScale.z);
             */
@@ -299,52 +295,4 @@ public class PlayerController : MonoBehaviour
             transform.localScale = new Vector3(this.transform.localScale.x, this.transform.localScale.y, this.transform.localScale.z);
         }
     }
-
-    private void AddSkill(GameObject skill)
-    {
-        if (currentNumberOfSkills < maxNumberOfSkills)
-        {
-            currentNumberOfSkills++;
-
-            //Activate Skill Here via Switch-Case - use the script component that holds the skill abilities
-        }
-        else if(currentNumberOfSkills == maxNumberOfSkills)
-        {
-            Debug.Log("Max Number Of Skills Reached");
-
-            //Deny Placement Of Skill onto Player and Move Skill to The SkillContainer
-        }
-    }
-
-    private void RemoveSkill(GameObject skill)
-    {
-        currentNumberOfSkills--;
-
-        //Deactivate Skill Here via Switch-Case
-    }
-    /*
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-        if (collision.tag == "Ground")
-        {
-            onGround = true;
-            canJump = true;
-            //TODO: Debug Log
-            Debug.Log("The Player has Detected the ground");
-        }
-    }
-
-    //This may be affecting the Double Jump detection variable set by only reading the
-    //  collision of the frame in which the player leaves the collision detection zone
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.tag == "Ground")
-        {
-            if (DoubleJumpEnabled)
-                doubleJumpSkill.HasDoubleJumped = false;
-            onGround = false;
-            //TODO: Debug Log
-            Debug.Log("The Player has Left the Ground");
-        }
-    }*/
 }

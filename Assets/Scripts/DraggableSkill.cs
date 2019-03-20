@@ -16,24 +16,7 @@ public class DraggableSkill : MonoBehaviour
     private LayerMask skillLayerMask;
     private Vector3 cursorPos;
     private Component attachedSkill;
-    //[SerializeField]
-    //[Tooltip("This is meant to hold the transform components of the SkillContainerHUDTarget object")]
-    //private Transform[] skillSlotPositions;
-    //**Skill Script Declaration template
-    //private Component skillScript;
-    //use a switch-case in the start method based on the name of this GameObject to get the correct SkillScript
-    /*Example:
-        switch(gameObject.name)
-        {
-            case "DoubleJump":
-                {
-                    skillScript = GetComponent<DoubleJumpSkill>();
-                }
-                break;
-            default:
-                break;
-        }
-    */
+    
     public Component AttachedSkill
     {
         get { return attachedSkill; }
@@ -58,30 +41,22 @@ public class DraggableSkill : MonoBehaviour
         skillContainer = GameObject.Find("SkillContainer");
         skillSlotHUDContainer = GameObject.Find("SkillContainerHUDTarget");
         DetermineSkillComponent();
-
-        /*May Not Need This
-        for (int i = 0; i < skillSlotHUDContainer.transform.childCount; i++)
-        {
-
-        }
-        */
     }
 
     private void DetermineSkillComponent()
     {
-        //If the search for the specific component does not return null, Then activate the skill's method
-        
-        if (GetComponent<SkillConnectionTest>())
+        //If the search for the specific component does not return null, Then activate the skill's method        
+        if (GetComponent<FloatingPlatformSkill>())
         {
-            //AttachedSkill = GetComponent<SkillConnectionTest>();
+            AttachedSkill = GetComponent<FloatingPlatformSkill>();
             //TODO: Debug Log
-            Debug.Log("Connection was successful. This Object now has an attached skill called " + AttachedSkill);
+            Debug.Log("Connection successful. " + gameObject.name + " now has an attached skill called " + AttachedSkill.name);
         }
         else if (GetComponent<DoubleJumpSkill>())
         {
             AttachedSkill = gameObject.GetComponent<DoubleJumpSkill>();
             //TODO: Debug Log
-            Debug.Log("Connection was successful. This Object now has an attached skill called " + AttachedSkill);
+            Debug.Log("Connection successful. " + gameObject.name + " now has an attached skill called " + AttachedSkill.name);
         }
     }
 
@@ -90,14 +65,10 @@ public class DraggableSkill : MonoBehaviour
     {
         if (selected == true)
         {
-            //TODO: Debug Log
-            Debug.Log("Skill Selected");
             TrackCursor();
         }
         else if (selected == true && onPlayer == true)
         {
-            //TODO: Debug Log
-            Debug.Log("Skill Selected & On Player");
             TrackCursor();
         }
         else if (onPlayer == true && selected == false)
@@ -110,14 +81,10 @@ public class DraggableSkill : MonoBehaviour
         }
     }
 
-
     private void ReturnToSkillContainer()
     {
         transform.SetParent(skillContainer.transform);
         childIndexNumber = transform.GetSiblingIndex();
-        //transform.position = skillSlotHUDContainer.transform.GetChild(childIndexNumber).GetComponent<Transform>().position;
-        //TODO: Debug Log
-        Debug.Log(name + " has a childIndex of " + childIndexNumber);
 
         if (childIndexNumber == 0)
         {
@@ -140,6 +107,7 @@ public class DraggableSkill : MonoBehaviour
             selected = true;
             isTransferable = true;
 
+            //Raycast to let the player drag skills off of objects
             Vector2 clickPosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
             RaycastHit2D[] hit = Physics2D.RaycastAll(Camera.main.ScreenToWorldPoint(clickPosition), Vector2.zero, skillLayerMask);
             
@@ -185,6 +153,7 @@ public class DraggableSkill : MonoBehaviour
         }
         else if (collision.tag == "Player" && Input.GetMouseButtonUp(0))
         {
+            //Code Here for calling the remove skill function in the PlayerController
             onPlayer = false;
             ReturnToSkillContainer();
         }
@@ -194,16 +163,12 @@ public class DraggableSkill : MonoBehaviour
     {
         if (collision.tag == "Player" && Input.GetMouseButtonUp(0))
         {
-            //TODO: Debug.Log
-            Debug.Log(collision.name + " PlayerCollision Detected");
             onPlayer = true;
             newParent = collision.gameObject;
             playerPos = collision.transform.position;
         }
         else if (collision.gameObject.name == "SkillContainer" && Input.GetMouseButtonDown(0) == false)
         {
-            //TODO: Debug.Log
-            Debug.Log("SkillContainer Collision Detected");
             onPlayer = false;
             newParent = collision.gameObject;
             playerPos = collision.transform.position;

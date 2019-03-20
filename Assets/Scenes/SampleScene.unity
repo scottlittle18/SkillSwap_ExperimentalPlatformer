@@ -124,7 +124,7 @@ GameObject:
   - component: {fileID: 19423262}
   m_Layer: 10
   m_Name: SkillSlot_0
-  m_TagString: Untagged
+  m_TagString: SkillSlot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -219,7 +219,7 @@ GameObject:
   - component: {fileID: 422751590}
   m_Layer: 10
   m_Name: SkillSlot_1
-  m_TagString: Untagged
+  m_TagString: SkillSlot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -373,7 +373,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.5130157, y: 3.4637878, z: -10}
+  m_LocalPosition: {x: -5.5122447, y: 3.4637878, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1528979173}
@@ -396,7 +396,7 @@ GameObject:
   - component: {fileID: 582518412}
   - component: {fileID: 582518415}
   m_Layer: 9
-  m_Name: DragTestV2
+  m_Name: Skill_FloatingPlatform
   m_TagString: Skill
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -532,7 +532,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 582518409}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e31d821cb0290043bdcce77509635f2, type: 3}
+  m_Script: {fileID: 11500000, guid: 3d643c72a95a010448a3b11df50e9471, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &597696703
@@ -660,7 +660,6 @@ MonoBehaviour:
   maxSpeed: 20
   accelerationForce: 10
   jumpHeight: 8
-  maxNumberOfSkills: 2
   groundCheckRadius: 0.1
   groundCheck: {fileID: 1928883674}
 --- !u!50 &597696708
@@ -853,9 +852,10 @@ GameObject:
   m_Component:
   - component: {fileID: 1248231564}
   - component: {fileID: 1248231565}
+  - component: {fileID: 1248231566}
   m_Layer: 10
   m_Name: SkillContainerHUDTarget
-  m_TagString: Untagged
+  m_TagString: SkillContainer
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -898,6 +898,18 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &1248231566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1248231563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54a7baaaa3bd44b44b8f574e1c2c3a6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1528979171
 GameObject:
   m_ObjectHideFlags: 0
@@ -1085,7 +1097,7 @@ GameObject:
   - component: {fileID: 1624255101}
   m_Layer: 10
   m_Name: SkillSlot_2
-  m_TagString: Untagged
+  m_TagString: SkillSlot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1541,7 +1553,6 @@ MonoBehaviour:
   maxSpeed: 20
   accelerationForce: 10
   jumpHeight: 8
-  maxNumberOfSkills: 1
   groundCheckRadius: 0.1
   groundCheck: {fileID: 1769634385}
 --- !u!50 &1919510103
