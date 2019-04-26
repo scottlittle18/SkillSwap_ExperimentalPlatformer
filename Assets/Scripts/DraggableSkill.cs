@@ -4,7 +4,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-//RENAME TO SkillHandler WHEN FINALIZED
+/// <summary>
+/// The *Parent script of the Skill scripts
+/// *(Currently just a seperate script that needs to be attached to each skill object)
+/// </summary>
+
+//TODO: RENAME TO SkillHandler WHEN FINALIZED
 public class DraggableSkill : MonoBehaviour
 {
     //Might need these to set skills
@@ -108,6 +113,12 @@ public class DraggableSkill : MonoBehaviour
         {
             ReturnToSkillContainer();
         }
+        else if (onPlayer == false && selected == true && transform.parent.name == "SkillContainer")
+        {
+            //TODO: Debug Log
+            Debug.Log("Skill Selected");
+            TrackCursor();
+        }
     }
 
 
@@ -137,14 +148,18 @@ public class DraggableSkill : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            selected = true;
-            isTransferable = true;
+            //selected = true;
+            //isTransferable = true;
 
             Vector2 clickPosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
             RaycastHit2D[] hit = Physics2D.RaycastAll(Camera.main.ScreenToWorldPoint(clickPosition), Vector2.zero, skillLayerMask);
             
             foreach (RaycastHit2D obj in hit)
             {
+                //TODO: Debug to determine which objects were detected by the RayCastHit2D
+                Debug.Log($"{obj.collider.name} was the object hit.");
+                Debug.Log($"{obj.collider.gameObject.layer} is the layer of the object.");
+                Debug.Log($"{obj.collider.tag} is the tag of the object.");
                 if (obj.collider.tag == "Skill")
                 {
                     selected = true;

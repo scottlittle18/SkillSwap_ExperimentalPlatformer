@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Handles the positioning of the SkillContainer Object
+/// </summary>
+
 public class SkillContainerScreenPlacement : MonoBehaviour
 {
     //Game Object that is a child of the camera and will be used to place the Skill Container

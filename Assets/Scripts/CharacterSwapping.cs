@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Used by the ActiveCharacterManager GameObject to allow the player to swap between characters
+/// </summary>
+
 public class CharacterSwapping : MonoBehaviour
 {
 
@@ -39,5 +43,6 @@ public class CharacterSwapping : MonoBehaviour
             transform.position = greenCharacter.transform.position;
         else if (yellowCharacter.CanMove == true)
             transform.position = yellowCharacter.transform.position;
+            
     }
 }
