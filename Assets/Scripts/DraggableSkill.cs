@@ -160,6 +160,7 @@ public class DraggableSkill : MonoBehaviour
                 Debug.Log($"{obj.collider.name} was the object hit.");
                 Debug.Log($"{obj.collider.gameObject.layer} is the layer of the object.");
                 Debug.Log($"{obj.collider.tag} is the tag of the object.");
+
                 if (obj.collider.tag == "Skill")
                 {
                     selected = true;
