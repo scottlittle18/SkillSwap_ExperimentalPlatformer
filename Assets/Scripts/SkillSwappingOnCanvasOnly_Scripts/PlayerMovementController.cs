@@ -9,6 +9,8 @@ using UnityEngine;
 
 public class PlayerMovementController : MonoBehaviour, ISwappableCharacter
 {
+    #region Field Mega-Region
+
     #region Serialized Fields
     [SerializeField]
     [Tooltip("Maximum possible movement speed of the active character.")]
@@ -29,6 +31,7 @@ public class PlayerMovementController : MonoBehaviour, ISwappableCharacter
     private float moveInput;
     private bool jumpInput;
     private bool canMove;
+    #endregion
     #endregion
 
     // Start is called before the first frame update
