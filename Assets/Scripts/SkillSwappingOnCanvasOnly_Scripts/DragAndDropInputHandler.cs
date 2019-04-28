@@ -14,6 +14,7 @@ public class DragAndDropInputHandler : MonoBehaviour
     private bool mouseButtonDownInput;
     private bool mouseButtonUpInput;
     private bool isDragging = false;
+    private GameObject skillToDrag;
     private GraphicRaycaster graphicRaycaster;
     private PointerEventData pointerEvent;
     private EventSystem eventSystem;
@@ -51,35 +52,70 @@ public class DragAndDropInputHandler : MonoBehaviour
         if (mouseButtonDownInput)
         {
             Debug.Log("Click!");
-            SelectObjectOnClick();
+            skillToDrag = GetDragTargetObject();
+            //isDragging = true;
         }
         else if (mouseButtonUpInput)
         {
-            //Release Cursor's Hold on Object
+            StopDraggingSkill();
         }
     }
 
-    private void SelectObjectOnClick()
+    private void StopDraggingSkill()
     {
-        Debug.Log("SelectObjectOnClick() Entered!");
+        switch (skillToDrag.name)
+        {
+            case "Skill_DoubleJump":
+                skillToDrag.GetComponent<Skill_DoubleJump>().IsBeingDragged = false;
+                Debug.Log("Correct Skill Name Determined");
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    private GameObject GetDragTargetObject()
+    {
         pointerEvent = new PointerEventData(EventSystem.current);
         pointerEvent.position = Input.mousePosition;
 
         List<RaycastResult> detectedRaycastObjects = new List<RaycastResult>();
         graphicRaycaster.Raycast(pointerEvent, detectedRaycastObjects);
 
+        GameObject dragTarget = null;
+
         if (detectedRaycastObjects == null)
         {
             Debug.Log("NO OBJECTS DETECTED OR RAYCAST HAS FAILED");
         }
-        else if (detectedRaycastObjects != null)
+        else
         {
             Debug.Log("Raycast Detected Objects");
 
             foreach (RaycastResult graphicObject in detectedRaycastObjects)
             {
                 Debug.Log($"{graphicObject.gameObject.name} was detected by the graphic raycast");
+
+                if (graphicObject.gameObject.tag == "Skill")
+                {
+                    dragTarget = graphicObject.gameObject;
+                    dragTarget.GetComponent<Skill_DoubleJump>().IsBeingDragged = true;
+                }
+                else
+                {
+                    Debug.Log("No Matching Tags Found");
+                }
             }
+        }
+
+        if(dragTarget != null)
+        {
+            return dragTarget;
+        }
+        else
+        {
+            return null;
         }
     }
 }

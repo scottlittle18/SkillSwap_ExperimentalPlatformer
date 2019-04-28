@@ -1111,7 +1111,7 @@ GameObject:
   - component: {fileID: 1716666443}
   - component: {fileID: 1716666442}
   m_Layer: 5
-  m_Name: Skill
+  m_Name: Skill_DoubleJump
   m_TagString: Skill
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
