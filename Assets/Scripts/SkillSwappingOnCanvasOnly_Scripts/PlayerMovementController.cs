@@ -41,6 +41,7 @@ public class PlayerMovementController : MonoBehaviour, ISwappableCharacter
     private bool jumpInput;
     private bool isActiveCharacter;
     private bool onGround;
+    private bool isAbleToJump;
     #endregion
     #endregion
 
@@ -55,7 +56,25 @@ public class PlayerMovementController : MonoBehaviour, ISwappableCharacter
     {
         //Listen For Player Input
         if (isActiveCharacter)
+        {
             ListenForMovementInput();
+
+            if(onGround)
+            {
+                ListenForJumpInput();
+                //isAbleToJump = true;
+            }
+        }
+    }
+
+    private void ListenForJumpInput()
+    {
+        jumpInput = Input.GetButtonDown("Jump");
+
+        if(jumpInput)
+        {
+            characterRigidbody.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        }
     }
 
     private void FixedUpdate()
@@ -65,12 +84,6 @@ public class PlayerMovementController : MonoBehaviour, ISwappableCharacter
 
         //HANDLE Character (Player) MOVEMENT
         CharacterMovementHandler();
-    }
-
-    private void CheckIfCharacterIsOnGround()
-    {
-        //Determine if the Character is on the ground
-        onGround = Physics2D.OverlapCircle(groundCheckObject.position, groundCheckRadius, whatIsGround);
     }
 
     private void InitializeCharacter()
@@ -84,11 +97,16 @@ public class PlayerMovementController : MonoBehaviour, ISwappableCharacter
         groundCheckObject = gameObject.transform.GetChild(1);
     }
 
+    private void CheckIfCharacterIsOnGround()
+    {
+        //Determine if the Character is on the ground
+        onGround = Physics2D.OverlapCircle(groundCheckObject.position, groundCheckRadius, whatIsGround);
+    }
+
     private void ListenForMovementInput()
     {
         //Input Variable Declarations
         moveInput = Input.GetAxisRaw("Horizontal");
-        jumpInput = Input.GetButtonDown("Jump");
     }
 
     private void CharacterMovementHandler()
