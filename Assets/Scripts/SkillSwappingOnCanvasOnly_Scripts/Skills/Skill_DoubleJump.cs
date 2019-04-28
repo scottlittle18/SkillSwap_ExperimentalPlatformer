@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Skill_DoubleJump : AttachableSkill, IDraggable
+public class Skill_DoubleJump : MonoBehaviour, IDraggable
 {
     // Start is called before the first frame update
     void Start()

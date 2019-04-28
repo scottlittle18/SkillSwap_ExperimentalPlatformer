@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
@@ -10,14 +11,19 @@ using UnityEngine.UI;
 
 public class DragAndDropInputHandler : MonoBehaviour
 {
-    private GraphicRaycaster
     private bool mouseButtonDownInput;
     private bool mouseButtonUpInput;
+    private bool isDragging = false;
+    private GraphicRaycaster graphicRaycaster;
+    private PointerEventData pointerEvent;
+    private EventSystem eventSystem;
 
     // Start is called before the first frame update
     private void Start()
     {
         Cursor.visible = true;
+        graphicRaycaster = GetComponent<GraphicRaycaster>();
+        eventSystem = GetComponent<EventSystem>();
     }
 
     // Update is called once per frame
@@ -34,21 +40,46 @@ public class DragAndDropInputHandler : MonoBehaviour
          * -- Good Luck brohannah :D
          */
 
-        //ListenForClickInput();
+        ListenForClickInput();
     }
-    /*
+    
     private void ListenForClickInput()
     {
         mouseButtonDownInput = Input.GetButtonDown("LeftMouseButton");
+        mouseButtonUpInput = Input.GetButtonUp("LeftMouseButton");
 
         if (mouseButtonDownInput)
         {
-            //Hold Object with Cursor
+            Debug.Log("Click!");
+            SelectObjectOnClick();
         }
         else if (mouseButtonUpInput)
         {
             //Release Cursor's Hold on Object
         }
     }
-    */
+
+    private void SelectObjectOnClick()
+    {
+        Debug.Log("SelectObjectOnClick() Entered!");
+        pointerEvent = new PointerEventData(EventSystem.current);
+        pointerEvent.position = Input.mousePosition;
+
+        List<RaycastResult> detectedRaycastObjects = new List<RaycastResult>();
+        graphicRaycaster.Raycast(pointerEvent, detectedRaycastObjects);
+
+        if (detectedRaycastObjects == null)
+        {
+            Debug.Log("NO OBJECTS DETECTED OR RAYCAST HAS FAILED");
+        }
+        else if (detectedRaycastObjects != null)
+        {
+            Debug.Log("Raycast Detected Objects");
+
+            foreach (RaycastResult graphicObject in detectedRaycastObjects)
+            {
+                Debug.Log($"{graphicObject.gameObject.name} was detected by the graphic raycast");
+            }
+        }
+    }
 }
