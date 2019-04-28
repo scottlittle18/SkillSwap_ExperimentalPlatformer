@@ -62,7 +62,6 @@ public class PlayerMovementController : MonoBehaviour, ISwappableCharacter
             if(onGround)
             {
                 ListenForJumpInput();
-                //isAbleToJump = true;
             }
         }
     }

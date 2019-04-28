@@ -72,24 +72,6 @@ public class DraggableSkill : MonoBehaviour
         */
     }
 
-    private void DetermineSkillComponent()
-    {
-        //If the search for the specific component does not return null, Then activate the skill's method
-        
-        if (GetComponent<SkillConnectionTest>())
-        {
-            //AttachedSkill = GetComponent<SkillConnectionTest>();
-            //TODO: Debug Log
-            Debug.Log("Connection was successful. This Object now has an attached skill called " + AttachedSkill);
-        }
-        else if (GetComponent<DoubleJumpSkill>())
-        {
-            AttachedSkill = gameObject.GetComponent<DoubleJumpSkill>();
-            //TODO: Debug Log
-            Debug.Log("Connection was successful. This Object now has an attached skill called " + AttachedSkill);
-        }
-    }
-
     // Update is called once per frame
     private void Update()
     {
@@ -121,6 +103,23 @@ public class DraggableSkill : MonoBehaviour
         }
     }
 
+    private void DetermineSkillComponent()
+    {
+        //If the search for the specific component does not return null, Then activate the skill's method
+        
+        if (GetComponent<SkillConnectionTest>())
+        {
+            //AttachedSkill = GetComponent<SkillConnectionTest>();
+            //TODO: Debug Log
+            Debug.Log("Connection was successful. This Object now has an attached skill called " + AttachedSkill);
+        }
+        else if (GetComponent<DoubleJumpSkill>())
+        {
+            AttachedSkill = gameObject.GetComponent<DoubleJumpSkill>();
+            //TODO: Debug Log
+            Debug.Log("Connection was successful. This Object now has an attached skill called " + AttachedSkill);
+        }
+    }
 
     private void ReturnToSkillContainer()
     {
