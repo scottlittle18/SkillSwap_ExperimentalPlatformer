@@ -24,13 +24,23 @@ public class PlayerMovementController : MonoBehaviour, ISwappableCharacter
     [SerializeField]
     [Tooltip("The amount of force that will be applied to the active character's jump.")]
     private float jumpForce;
+
+    [SerializeField]
+    [Tooltip("The detection radius of the ground check GameObject")]
+    private float groundCheckRadius;
+
+    [SerializeField]
+    [Tooltip("The Transform of the ground check GameObject")]
+    private Transform groundCheckObject;
     #endregion
 
     #region Non-Serialized Fields
     private Rigidbody2D characterRigidbody;
+    private LayerMask whatIsGround;
     private float moveInput;
     private bool jumpInput;
-    private bool canMove;
+    private bool isActiveCharacter;
+    private bool onGround;
     #endregion
     #endregion
 
@@ -44,25 +54,41 @@ public class PlayerMovementController : MonoBehaviour, ISwappableCharacter
     private void Update()
     {
         //Listen For Player Input
-        if (canMove)
+        if (isActiveCharacter)
             ListenForMovementInput();
     }
 
     private void FixedUpdate()
     {
-        //Handle Character (Player) Movement
+        //CHECK if the Character is ON the GROUND
+        CheckIfCharacterIsOnGround();
+
+        //HANDLE Character (Player) MOVEMENT
         CharacterMovementHandler();
+    }
+
+    private void CheckIfCharacterIsOnGround()
+    {
+        //Determine if the Character is on the ground
+        onGround = Physics2D.OverlapCircle(groundCheckObject.position, groundCheckRadius, whatIsGround);
     }
 
     private void InitializeCharacter()
     {
         characterRigidbody = GetComponent<Rigidbody2D>();
+
+        //Define Ground Layer Mask
+        whatIsGround = LayerMask.GetMask("Ground");
+
+        //Define groundCheckObject
+        groundCheckObject = gameObject.transform.GetChild(1);
     }
 
     private void ListenForMovementInput()
     {
         //Input Variable Declarations
         moveInput = Input.GetAxisRaw("Horizontal");
+        jumpInput = Input.GetButtonDown("Jump");
     }
 
     private void CharacterMovementHandler()
@@ -76,15 +102,18 @@ public class PlayerMovementController : MonoBehaviour, ISwappableCharacter
         characterRigidbody.velocity = clampedVelocity;
     }
 
+    #region ISwappableCharacter Interface
+
     public void SetAsInactiveCharacter()
     {
         //TODO: Used to change between the currently controlled character
-        canMove = false;
+        isActiveCharacter = false;
     }
 
     public void SetAsActiveCharacter()
     {
         //Used to make this the active character
-        canMove = true;
+        isActiveCharacter = true;
     }
+    #endregion
 }
