@@ -21,6 +21,8 @@ public class Skill_DoubleJump : MonoBehaviour, IDraggable
     // Update is called once per frame
     void Update()
     {
+
+        //Check if the object is being dragged
         if(IsBeingDragged)
         {
             StartBeingDraggedByCursor();
@@ -28,6 +30,12 @@ public class Skill_DoubleJump : MonoBehaviour, IDraggable
     }
 
     #region IDraggable & IDroppable Interfaces
+    public void SetInitialStartingPoint()
+    {
+        //Set the position of the game object to it's appropriate
+        //position in the SkillContainer Object.
+    }
+
     public void StartBeingDraggedByCursor()
     {
         //Make the Target of the Drag Action follow the Cursor

@@ -3,6 +3,7 @@
 /// </summary>
 public interface IDraggable
 {
+    void SetInitialStartingPoint();
     void StartBeingDraggedByCursor();
 }
 

@@ -14,10 +14,18 @@ public class DragAndDropInputHandler : MonoBehaviour
     private bool mouseButtonDownInput;
     private bool mouseButtonUpInput;
     private bool isDragging = false;
+
     private GameObject skillToDrag;
     private GraphicRaycaster graphicRaycaster;
     private PointerEventData pointerEvent;
     private EventSystem eventSystem;
+    private SkillContainerSkillSlotPlacementHandler skillPlacementHandler;
+
+    private GameObject[] skillBank;
+
+    [SerializeField]
+    [Tooltip("Used to adjust the X position of the draggable object")]
+    private float xOffset, yOffset;
 
     // Start is called before the first frame update
     private void Start()
@@ -25,22 +33,24 @@ public class DragAndDropInputHandler : MonoBehaviour
         Cursor.visible = true;
         graphicRaycaster = GetComponent<GraphicRaycaster>();
         eventSystem = GetComponent<EventSystem>();
+        skillPlacementHandler = transform.GetChild(0).GetComponent<SkillContainerSkillSlotPlacementHandler>();
+        SetSkillsToHomePosition();
+    }
+    private void SetSkillsToHomePosition()
+    {
+        skillBank = GameObject.FindGameObjectsWithTag("Skill");
+        
+        for (int i = 0; i < skillBank.Length; i++)
+        {
+            skillBank[i].transform.position = 
+                new Vector2(skillPlacementHandler.transform.GetChild(i).position.x + xOffset, skillPlacementHandler.transform.GetChild(i).position.y + yOffset);
+
+        }
     }
 
     // Update is called once per frame
     private void Update()
     {
-        /* 
-         * TODO:    ------HEY!! FUTURE MEE!------
-         * This is where you left off. You were gonna start to implement
-         * the draggable functionailty by starting with the click hander
-         * and then the drag handler. However, you weren't sure if you should
-         * do that by making it a function of the button component of the skill
-         * by using a public function somewhere in this script OR by seeing where
-         * the script in your browser takes you.
-         * -- Good Luck brohannah :D
-         */
-
         ListenForClickInput();
     }
     
@@ -53,7 +63,6 @@ public class DragAndDropInputHandler : MonoBehaviour
         {
             Debug.Log("Click!");
             skillToDrag = GetDragTargetObject();
-            //isDragging = true;
         }
         else if (mouseButtonUpInput)
         {
@@ -70,6 +79,8 @@ public class DragAndDropInputHandler : MonoBehaviour
                 Debug.Log("Correct Skill Name Determined");
                 break;
 
+                //ADD NEW SKILLS HERE
+
             default:
                 break;
         }
@@ -77,22 +88,21 @@ public class DragAndDropInputHandler : MonoBehaviour
 
     private GameObject GetDragTargetObject()
     {
+        //Used to listen to Pointer based Events
         pointerEvent = new PointerEventData(EventSystem.current);
         pointerEvent.position = Input.mousePosition;
 
+        //Create a list to store the objects detected by the GraphicRaycaster
         List<RaycastResult> detectedRaycastObjects = new List<RaycastResult>();
+
+        //Fire to "RAY" "CAST"
         graphicRaycaster.Raycast(pointerEvent, detectedRaycastObjects);
 
+        //Used to hold the target of the Raycast
         GameObject dragTarget = null;
 
-        if (detectedRaycastObjects == null)
+        if (detectedRaycastObjects != null)
         {
-            Debug.Log("NO OBJECTS DETECTED OR RAYCAST HAS FAILED");
-        }
-        else
-        {
-            Debug.Log("Raycast Detected Objects");
-
             foreach (RaycastResult graphicObject in detectedRaycastObjects)
             {
                 Debug.Log($"{graphicObject.gameObject.name} was detected by the graphic raycast");
@@ -107,6 +117,10 @@ public class DragAndDropInputHandler : MonoBehaviour
                     Debug.Log("No Matching Tags Found");
                 }
             }
+        }
+        else
+        {
+            Debug.Log("NO OBJECTS DETECTED OR RAYCAST HAS FAILED");
         }
 
         if(dragTarget != null)
