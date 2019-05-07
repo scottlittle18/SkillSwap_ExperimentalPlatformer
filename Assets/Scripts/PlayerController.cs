@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     [Tooltip("The transform of the groundCheck GameObject")]
     private Transform groundCheck;
     #endregion
+
     #region Non-Serialized Fields
     private Rigidbody2D playerRigidBody;
     private CircleCollider2D isTriggerCollision;

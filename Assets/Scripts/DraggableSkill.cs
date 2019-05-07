@@ -61,7 +61,7 @@ public class DraggableSkill : MonoBehaviour
         Cursor.visible = true;
         skillLayerMask = LayerMask.GetMask("Skill");
         skillContainer = GameObject.Find("SkillContainer");
-        skillSlotHUDContainer = GameObject.Find("SkillContainerHUDTarget");
+        skillSlotHUDContainer = GameObject.Find("SkillContainerHUDTarget_Object");
         DetermineSkillComponent();
 
         /*May Not Need This
@@ -131,15 +131,15 @@ public class DraggableSkill : MonoBehaviour
 
         if (childIndexNumber == 0)
         {
-            transform.position = GameObject.Find("SkillSlot_0").GetComponent<Transform>().position;
+            transform.position = GameObject.Find("SkillSlot0").GetComponent<Transform>().position;
         }
         else if (childIndexNumber == 1)
         {
-            transform.position = GameObject.Find("SkillSlot_1").GetComponent<Transform>().position;
+            transform.position = GameObject.Find("SkillSlot1").GetComponent<Transform>().position;
         }
         else if (childIndexNumber == 2)
         {
-            transform.position = GameObject.Find("SkillSlot_2").GetComponent<Transform>().position;
+            transform.position = GameObject.Find("SkillSlot2").GetComponent<Transform>().position;
         }
     }
 
@@ -194,11 +194,11 @@ public class DraggableSkill : MonoBehaviour
     private void OnTriggerExit2D(Collider2D collision)
     {
         //Not Checking for the MouseButtonDown(0) will cause the skill to disappear when the object's current parent collides with another
-        if(collision.tag == "Player" && Input.GetMouseButtonDown(0))
+        if(collision.tag == "SkillDetector" && Input.GetMouseButtonDown(0))
         {
             onPlayer = false;
         }
-        else if (collision.tag == "Player" && Input.GetMouseButtonUp(0))
+        else if (collision.tag == "SkillDetector" && Input.GetMouseButtonUp(0))
         {
             onPlayer = false;
             ReturnToSkillContainer();
@@ -207,7 +207,18 @@ public class DraggableSkill : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.tag == "Player" && Input.GetMouseButtonUp(0))
+        //TODO: Debug for Trigger Detection
+        Debug.Log($"The Skill has collided with {collision.gameObject.name}");
+
+        if (collision.name == "Character1_SkillDetector" && Input.GetMouseButtonUp(0))
+        {
+            //TODO: Debug.Log
+            Debug.Log(collision.name + " PlayerCollision Detected");
+            onPlayer = true;
+            newParent = collision.gameObject;
+            playerPos = collision.transform.position;
+        }
+        else if (collision.name == "Character2_SkillDetector" && Input.GetMouseButtonUp(0))
         {
             //TODO: Debug.Log
             Debug.Log(collision.name + " PlayerCollision Detected");
